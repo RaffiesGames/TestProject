@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider,  } from 'cc';
+import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent,  } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerControl')
@@ -10,7 +10,6 @@ export class PlayerControl extends Component
     
     private _startMove = false;
     private _moveTime = 0.1;
-    private _moveSpeed = 0;
     private _curMoveTime = 0;
     private _curMoveSpeed = 0;
     private _moveStep = 0;
@@ -23,9 +22,20 @@ export class PlayerControl extends Component
     start() 
     {
         let collider = this.getComponent(Collider);
-
+        collider?.on('onCollisionEnter', this.onCollisionEnter, this);
         systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+    }
+
+    onCollisionEnter(event : ICollisionEvent)
+    {        
+        this.HP -= 1;
+        if(this.HP == 0)
+        {
+            event.selfCollider.destroy();
+            this.node.destroy();
+        }
+        event.otherCollider.node.destroy();
     }
 
     onKeyDown(event : EventKeyboard)
@@ -34,11 +44,11 @@ export class PlayerControl extends Component
         {
             case macro.KEY.a:
                 this.accLeft = true;
-                this.move(-1);
+                this.move(-2);
                 break;
             case macro.KEY.d:
                 this.accRight = true;
-                this.move(1);
+                this.move(2);
                 break;
         }
     }
@@ -58,11 +68,11 @@ export class PlayerControl extends Component
         this.node.getPosition(this.curPosition);
         if(this.accLeft)
         {
-            Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, axis)); 
+            Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, this._moveStep)); 
         }
         else if(this.accRight)
         {
-            Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, axis));
+            Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, this._moveStep));
         }
     }
 

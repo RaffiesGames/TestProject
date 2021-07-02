@@ -35,24 +35,13 @@ export class Fire extends Component {
     shoot()
     {
         this.newProjectile = instantiate(this.projectile);
-        //newProjectile.setPosition(this.node.position.x, this.node.position.y, this.node.position.z-1);
-        this.newProjectile.setPosition(0,0,-1);
+        this.newProjectile.setPosition(0,0,-1.5);
         this.node.addChild(this.newProjectile);
-        tween(this.newProjectile).to(0.5, { position: new Vec3(0, 0, 0-10)}).start();
-        //this.node.removeChild(newProjectile);
-        
+        tween(this.newProjectile).to(0.5, { position: new Vec3(0, 0, -15)}).start();        
     }
 
     update (deltaTime: number) 
     {
         this.curTime += deltaTime;
-        
-        if(this.newProjectile)
-        {
-            if(this.newProjectile.position.z == -10)
-            {
-                this.newProjectile.destroy();        
-            }
-        }
     }
 }

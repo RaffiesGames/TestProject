@@ -170,7 +170,7 @@
     },
     "_materials": [
       {
-        "__uuid__": "d871296a-41cb-49ae-8eca-ae636edeafa5",
+        "__uuid__": "166b0b4d-9d97-4cea-bed4-eb5983f942fd",
         "__expectedType__": "cc.Material"
       }
     ],
@@ -230,7 +230,7 @@
     },
     "_materials": [
       {
-        "__uuid__": "ced9e0ae-3eed-451e-9710-5965025d4f19",
+        "__uuid__": "535739b9-ec6a-4c06-a002-824770d7ae55",
         "__expectedType__": "cc.Material"
       }
     ],
@@ -325,6 +325,11 @@
       "__id__": 15
     },
     "hitCount": 3,
+    "maxRandom": 1,
+    "projectile": {
+      "__uuid__": "7cb633ec-c4cf-4f42-98dc-e06b75a07484",
+      "__expectedType__": "cc.Prefab"
+    },
     "_id": ""
   },
   {
