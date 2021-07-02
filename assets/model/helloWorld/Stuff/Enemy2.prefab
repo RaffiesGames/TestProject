@@ -52,7 +52,7 @@
       "__type__": "cc.Vec3",
       "x": 4,
       "y": 4,
-      "z": 5
+      "z": 4
     },
     "_layer": 1073741824,
     "_euler": {
@@ -327,7 +327,7 @@
     "hitCount": 2,
     "maxRandom": 3,
     "projectile": {
-      "__uuid__": "7cb633ec-c4cf-4f42-98dc-e06b75a07484",
+      "__uuid__": "c268a6aa-7151-4639-9990-b207b5b33206",
       "__expectedType__": "cc.Prefab"
     },
     "_id": ""
@@ -348,7 +348,7 @@
       "__id__": 17
     },
     "_material": null,
-    "_isTrigger": false,
+    "_isTrigger": true,
     "_center": {
       "__type__": "cc.Vec3",
       "x": 0,

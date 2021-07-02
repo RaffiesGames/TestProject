@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent,  } from 'cc';
+import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent, ITriggerEvent,  } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerControl')
@@ -22,20 +22,27 @@ export class PlayerControl extends Component
     start() 
     {
         let collider = this.getComponent(Collider);
-        collider?.on('onCollisionEnter', this.onCollisionEnter, this);
+        collider?.on('onTriggerEnter', this.onCollisionEnter, this);
         systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
         systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
     }
 
-    onCollisionEnter(event : ICollisionEvent)
+    onCollisionEnter(event : ITriggerEvent)
     {        
-        this.HP -= 1;
+        if(event.otherCollider.name == "EProjectile<SphereCollider>")
+        {
+            this.HP -= 1;
+            event.otherCollider.node.destroy();
+        }
+        else if(event.otherCollider.name == "Projectile<SphereCollider>")
+        {
+            event.otherCollider.node.destroy();
+        }
         if(this.HP == 0)
         {
             event.selfCollider.destroy();
             this.node.destroy();
         }
-        event.otherCollider.node.destroy();
     }
 
     onKeyDown(event : EventKeyboard)

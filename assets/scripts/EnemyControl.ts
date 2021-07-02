@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, Prefab, director, Collider, CollisionEventType, ICollisionEvent, instantiate, tween, Vec3, random, randomRangeInt } from 'cc';
+import { _decorator, Component, Node, Prefab, director, Collider, CollisionEventType, ICollisionEvent, instantiate, tween, Vec3, random, randomRangeInt, ITriggerEvent } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyControl')
@@ -26,20 +26,24 @@ export class EnemyControl extends Component {
     private prevShootTime:number = 0;
     private curTime:number = 0;
     private startMoveTime:number = 0;
-    private newMoveTime:number = 1;
+    private newMoveTime:number = 0.1;
     private newProjectile;
 
     start ()
     {
         let collider = this.getComponent(Collider);
-        collider?.on('onCollisionEnter', this.onCollisionEnter, this);
+        collider?.on('onTriggerEnter', this.onCollisionEnter, this);
     }
 
-    onCollisionEnter(event : ICollisionEvent)
+    onCollisionEnter(event : ITriggerEvent)
     {
-        if(event.otherCollider.name == "Projectile")
+        if(event.otherCollider.name == "Projectile<SphereCollider>")
         {    
             this.hitCount -= 1;
+            event.otherCollider.node.destroy();
+        }
+        else if(event.otherCollider.name == "EProjectile<SphereCollider>")
+        {
             event.otherCollider.node.destroy();
         }
         if(this.hitCount == 0)
@@ -67,101 +71,33 @@ export class EnemyControl extends Component {
 
     move()
     {
-        var axis = randomRangeInt(-1,1);
-        if(axis)
+        var newX = this.node.position.x;
+        var newY = this.node.position.y;
+        var newZ = this.node.position.z;
+
+        newZ += 1;
+        
+        if(this.node.position.z >= 35)
         {
-            axis = -7;
+            newX -= 3;
+            newZ = -35;
         }
-        else
-        {
-            axis = 7;
-        }
-        this._startMove = true;
-        this._moveStep = axis;
-        this._curMoveSpeed = this._moveStep / this._moveTime;
-        this._curMoveTime = 0;
-        this.node.getPosition(this.curPosition);
-        if(this.newPosition.z <= 40 && this.newPosition.z >= -40)
-        { 
-            Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, this._moveStep)); 
-        }
-        else
-        {
-            if(this.newPosition.z < 0)
-            {
-                this.newPosition.z += 7;
-            }
-            else
-            {
-                this.newPosition.z -= 7;
-            }
-            this.newPosition.x -= 2;
-            this.curPosition.x -=2;
-            console.log("ERROR 3" + this.node.name);
-        }
+
+        this.node.setPosition(newX, newY, newZ);
     }
 
     update (deltaTime: number) 
     {
         this.curTime += deltaTime;
-        if(this._startMove)
-        {
-            this._curMoveTime += deltaTime;
-            if(this._curMoveTime > this._moveTime)
-            {
-                if(this.newPosition.z <= 40 && this.newPosition.z >= -40)
-                { 
-                    this.node.setPosition(this.newPosition);
-                    this._startMove = false;
-                }
-                else
-                {
-                    if(this.newPosition.z < 0)
-                    {
-                        this.newPosition.z += 7;
-                    }
-                    else
-                    {
-                        this.newPosition.z -= 7;
-                    }
-                    this.newPosition.x -= 2;
-                    this.curPosition.x -=2;
-                    console.log("ERROR 1 " + this.node.name);
-                }
-            }
-            else
-            {
-                this.node.setPosition(this.curPosition);
-                this._deltaPos.z = this._curMoveSpeed * deltaTime;
-                Vec3.add(this.curPosition, this.curPosition, this._deltaPos);
-                if(this.curPosition.z <= 40 && this.curPosition.z >= -40)
-                {
-                    this.node.setPosition(this.curPosition);
-                }
-                else
-                {
-                    if(this.curPosition.z < 0)
-                    {
-                        this.curPosition.z += 7;
-                    }
-                    else
-                    {
-                        this.curPosition.z -= 7;
-                    }
-                    this.newPosition.x -= 2;
-                    this.curPosition.x -=2;
-                    console.log("ERROR 2" + this.node.name);
-                }
-            }
-        }
         if(this.node.isValid)
         {
-            if(this.curTime - this.startMoveTime >= this.newMoveTime || this.curTime <= 0)
+            if(this.curTime - this.startMoveTime >= this.newMoveTime)
             {
                 this.startMoveTime = this.curTime;
                 this.move();
             }
             this.shoot();
+            this.newProjectile.removeFromarent();            
         }
     }
 }
