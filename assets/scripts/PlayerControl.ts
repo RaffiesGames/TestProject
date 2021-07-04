@@ -1,12 +1,12 @@
 
-import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent, ITriggerEvent,  } from 'cc';
+import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent, ITriggerEvent, clamp,  } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerControl')
 export class PlayerControl extends Component 
 {
     @property
-    HP: number = 5;
+    HP: number = 3;
     
     private _startMove = false;
     private _moveTime = 0.1;
@@ -18,13 +18,30 @@ export class PlayerControl extends Component
     private _deltaPos = new Vec3();
     private accLeft = false;
     private accRight = false;
+    private collider:Collider = null!;
+    public _curScore = 0;
+    public active = false;
 
     start() 
     {
-        let collider = this.getComponent(Collider);
-        collider?.on('onTriggerEnter', this.onCollisionEnter, this);
-        systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-        systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
+        this.collider = this.getComponent(Collider)!;
+    }
+
+    setInputActive(activeState:boolean)
+    {
+        this.active = activeState;
+        if(this.active)
+        {
+            this.collider.on('onTriggerEnter', this.onCollisionEnter, this)!;
+            systemEvent.on(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this)!;
+            systemEvent.on(SystemEvent.EventType.KEY_UP, this.onKeyUp, this)!;
+        }
+        else
+        {
+            this.collider.off('onTriggerEnter', this.onCollisionEnter, this)!;
+            systemEvent.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this)!;
+            systemEvent.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this)!;
+        }
     }
 
     onCollisionEnter(event : ITriggerEvent)
@@ -40,8 +57,8 @@ export class PlayerControl extends Component
         }
         if(this.HP == 0)
         {
-            event.selfCollider.destroy();
-            this.node.destroy();
+            //event.selfCollider.destroy();
+            //this.node.destroy();
         }
     }
 
@@ -50,12 +67,10 @@ export class PlayerControl extends Component
         switch(event.keyCode)
         {
             case macro.KEY.a:
-                this.accLeft = true;
-                this.move(-2);
+                this.move(-2, true, false);
                 break;
             case macro.KEY.d:
-                this.accRight = true;
-                this.move(2);
+                this.move(2, false, true);
                 break;
         }
     }
@@ -66,8 +81,10 @@ export class PlayerControl extends Component
         this.accRight = false;
     }
 
-    move(axis: number)
+    move(axis: number, left:boolean, right:boolean)
     {
+        this.accLeft = left;
+        this.accRight = right;
         this._startMove = true;
         this._moveStep = axis;
         this._curMoveSpeed = this._moveStep / this._moveTime;
@@ -75,10 +92,12 @@ export class PlayerControl extends Component
         this.node.getPosition(this.curPosition);
         if(this.accLeft)
         {
+            this.newPosition.z = clamp(this.newPosition.z, -35, 35);
             Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, this._moveStep)); 
         }
         else if(this.accRight)
         {
+            this.newPosition.z = clamp(this.newPosition.z, -35, 35);
             Vec3.add(this.newPosition, this.curPosition, new Vec3(0 ,0, this._moveStep));
         }
     }
@@ -92,14 +111,17 @@ export class PlayerControl extends Component
             this._curMoveTime += deltaTime;
             if(this._curMoveTime > this._moveTime)
             {
+                this.newPosition.z = clamp(this.newPosition.z, -35, 35);
                 this.node.setPosition(this.newPosition);
                 this._startMove = false;
             }
             else
             {
+                this.curPosition.z = clamp(this.curPosition.z, -35, 35);
                 this.node.setPosition(this.curPosition);
                 this._deltaPos.z = this._curMoveSpeed * deltaTime;
                 Vec3.add(this.curPosition, this.curPosition, this._deltaPos);
+                this.curPosition.z = clamp(this.curPosition.z, -35, 35);
                 this.node.setPosition(this.curPosition);
             }
         }

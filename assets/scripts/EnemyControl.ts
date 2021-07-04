@@ -1,5 +1,7 @@
 
 import { _decorator, Component, Node, Prefab, director, Collider, CollisionEventType, ICollisionEvent, instantiate, tween, Vec3, random, randomRangeInt, ITriggerEvent } from 'cc';
+import { PlayerControl } from './PlayerControl';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('EnemyControl')
@@ -7,11 +9,15 @@ export class EnemyControl extends Component {
     
     @property
     hitCount: number = 1;
+
     @property
-    maxRandom: number = 2;
+    reloadTime: number = 2;
+
+    @property(PlayerControl)
+    playControl: PlayerControl = null!;
 
     @property(Prefab)
-    projectile: Prefab = null;
+    projectile: Prefab = null!;
 
     private _startMove = false;
     private _moveStep = 0;
@@ -22,33 +28,48 @@ export class EnemyControl extends Component {
     private _curMoveSpeed = 0;
     private _moveTime = 0.1;
     private shootTime:number = 0;
-    private reloadTime:number = 2;
     private prevShootTime:number = 0;
     private curTime:number = 0;
     private startMoveTime:number = 0;
     private newMoveTime:number = 0.1;
-    private newProjectile;
+    private newProjectile:Node = null!;
+    private collider:Collider = null!;
+    
 
     start ()
     {
-        let collider = this.getComponent(Collider);
-        collider?.on('onTriggerEnter', this.onCollisionEnter, this);
+        this.collider = this.getComponent(Collider)!;
+        this.collider.on('onTriggerEnter', this.onCollisionEnter, this);
+
     }
 
     onCollisionEnter(event : ITriggerEvent)
     {
         if(event.otherCollider.name == "Projectile<SphereCollider>")
-        {    
+        {   
             this.hitCount -= 1;
             event.otherCollider.node.destroy();
         }
-        else if(event.otherCollider.name == "EProjectile<SphereCollider>")
+        if(event.otherCollider.name == "EProjectile<SphereCollider>")
         {
             event.otherCollider.node.destroy();
         }
+        
         if(this.hitCount == 0)
         {
             event.selfCollider.destroy();
+            if(event.selfCollider.name == "Enemy<BoxCollider>")
+            {
+                this.playControl._curScore+=1;
+            }
+            else if(event.selfCollider.name == "Enemy2<BoxCollider>")
+            {
+                this.playControl._curScore+=2;
+            }
+            else if(event.selfCollider.name == "Enemy3<BoxCollider>")
+            {
+                this.playControl._curScore+=3;
+            }
             this.node.destroy();
         }
     }
@@ -57,15 +78,12 @@ export class EnemyControl extends Component {
     {
         this.shootTime = this.curTime;
         if(this.shootTime - this.prevShootTime >= this.reloadTime)
-        {
-            if(randomRangeInt(-2,this.maxRandom))
-            {
-                this.prevShootTime = this.curTime;
-                this.newProjectile = instantiate(this.projectile);
-                this.newProjectile.setPosition(0,0,-1.5);
-                this.node.addChild(this.newProjectile);
-                tween(this.newProjectile).to(0.5, { position: new Vec3(0, 0, -15)}).start();
-            }
+        {            
+            this.prevShootTime = this.curTime;
+            this.newProjectile = instantiate(this.projectile);
+            this.newProjectile.setPosition(0,0,-1.5);
+            this.node.addChild(this.newProjectile);
+            tween(this.newProjectile).to(0.5, { position: new Vec3(0, 0, -15)}).start();
         }
     }
 
@@ -82,22 +100,28 @@ export class EnemyControl extends Component {
             newX -= 3;
             newZ = -35;
         }
-
+        if(newX <= -12)
+        {
+            this.playControl.HP = 0;
+        }
         this.node.setPosition(newX, newY, newZ);
     }
 
     update (deltaTime: number) 
     {
-        this.curTime += deltaTime;
-        if(this.node.isValid)
+        if(this.playControl.active)
         {
-            if(this.curTime - this.startMoveTime >= this.newMoveTime)
+            this.curTime += deltaTime;
+            if(this.node.isValid)
             {
-                this.startMoveTime = this.curTime;
-                this.move();
+                if(this.curTime - this.startMoveTime >= this.newMoveTime)
+                {
+                    this.startMoveTime = this.curTime;
+                    this.move();
+                }
+                this.shoot();      
+                
             }
-            this.shoot();
-            this.newProjectile.removeFromarent();            
         }
     }
 }

@@ -6,7 +6,7 @@ const { ccclass, property } = _decorator;
 export class Fire extends Component {
     
     @property(Prefab)
-    projectile: Prefab = null;
+    projectile: Prefab = null!;
 
     private posX:number = 0;
     private posY:number = 0;
@@ -15,7 +15,7 @@ export class Fire extends Component {
     private reloadTime:number = 1;
     private prevShootTime:number = 0;
     private curTime:number = 0;
-    private newProjectile;
+    private newProjectile:Node = null!;
 
     start () 
     {

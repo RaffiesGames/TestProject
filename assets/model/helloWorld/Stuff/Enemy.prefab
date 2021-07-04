@@ -13,7 +13,7 @@
   {
     "__type__": "cc.Node",
     "_name": "Enemy",
-    "_objFlags": 0,
+    "_objFlags": 512,
     "_parent": null,
     "_children": [
       {
@@ -37,9 +37,9 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 12.657,
-      "y": 4.8,
-      "z": 0
+      "x": 5,
+      "y": 5,
+      "z": -8
     },
     "_lrot": {
       "__type__": "cc.Quat",
@@ -54,11 +54,11 @@
       "y": 3,
       "z": 3
     },
-    "_layer": 1073741824,
+    "_layer": 8388608,
     "_euler": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 90,
+      "y": 89.99999999999999,
       "z": 0
     },
     "_id": ""
@@ -103,7 +103,7 @@
       "y": 1,
       "z": 1
     },
-    "_layer": 1073741824,
+    "_layer": 8388608,
     "_euler": {
       "__type__": "cc.Vec3",
       "x": 0,
@@ -148,7 +148,7 @@
       "y": 0.64,
       "z": 0.1
     },
-    "_layer": 1073741824,
+    "_layer": 8388608,
     "_euler": {
       "__type__": "cc.Vec3",
       "x": 90,
@@ -325,7 +325,8 @@
       "__id__": 15
     },
     "hitCount": 1,
-    "maxRandom": 5,
+    "reloadTime": 3,
+    "playControl": null,
     "projectile": {
       "__uuid__": "c268a6aa-7151-4639-9990-b207b5b33206",
       "__expectedType__": "cc.Prefab"

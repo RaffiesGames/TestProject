@@ -325,7 +325,7 @@
       "__id__": 15
     },
     "hitCount": 3,
-    "maxRandom": 1,
+    "reloadTime": 5,
     "projectile": {
       "__uuid__": "c268a6aa-7151-4639-9990-b207b5b33206",
       "__expectedType__": "cc.Prefab"
