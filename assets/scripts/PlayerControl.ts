@@ -1,5 +1,5 @@
 
-import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent, ITriggerEvent, clamp,  } from 'cc';
+import { _decorator, Component, Node, systemEvent, SystemEventType, EventKeyboard, Vec3, macro, SystemEvent, EventMouse, Prefab, instantiate, tween, Collider, ICollisionEvent, ITriggerEvent, clamp, AudioClip, AudioSource,  } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('PlayerControl')
@@ -7,7 +7,12 @@ export class PlayerControl extends Component
 {
     @property
     HP: number = 3;
+
+    //@property(AudioClip)
+    //hitAudio: AudioClip = null!;
     
+
+    private aSource: AudioSource = null!;
     private _startMove = false;
     private _moveTime = 0.1;
     private _curMoveTime = 0;
@@ -48,17 +53,13 @@ export class PlayerControl extends Component
     {        
         if(event.otherCollider.name == "EProjectile<SphereCollider>")
         {
+            //this.playHitAudio();
             this.HP -= 1;
             event.otherCollider.node.destroy();
         }
         else if(event.otherCollider.name == "Projectile<SphereCollider>")
         {
             event.otherCollider.node.destroy();
-        }
-        if(this.HP == 0)
-        {
-            //event.selfCollider.destroy();
-            //this.node.destroy();
         }
     }
 
@@ -81,6 +82,14 @@ export class PlayerControl extends Component
         this.accRight = false;
     }
 
+/*
+    playHitAudio()
+    {
+        this.aSource = this.node.getComponent(AudioSource)!;
+        this.aSource.clip = this.hitAudio;
+        this.aSource.play();
+    }
+*/
     move(axis: number, left:boolean, right:boolean)
     {
         this.accLeft = left;

@@ -40,7 +40,6 @@ export class CoverCollider extends Component
             event.selfCollider.destroy();
             this.node.destroy();
         }
-        console.log(event.otherCollider.name);
     }
 
 }
